@@ -51,8 +51,16 @@
             ws.close();
         }
         function sendMessage() {
-            var msgObj = JSON.parse(document.getElementById("msgToServer").value);
-            ws.send(JSON.stringify(msgObj));
+            var icon = document.getElementById("error_icon");
+            try {
+                var msgObj = JSON.parse(document.getElementById("msgToServer").value);
+                ws.send(JSON.stringify(msgObj));
+                icon.style.visibility = "hidden";
+                icon.title = '';
+            } catch (e) {
+                icon.style.visibility = "visible";
+                icon.title = e.message;
+            }
         }
 
     </script>
@@ -66,54 +74,50 @@
     </div>
 
     <div class="jumbotron_">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label for="serverSelected" class="col-sm-1 control-label">URL:</label>
+                <div class="col-sm-7">
+                    <input type="text" id="serverSelected" class="form-control" placeholder="ws://domain/path"/>
 
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="input-group">
-
-                    <input type="text" id="serverSelected"/>
-
-                      <span class="input-group-btn">
-                          <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">Connect
-                          </button>
-                      </span>
-                      <span class="input-group-btn">
-                          <button type="button" class="btn btn-sm btn-danger" onclick="disconnectToServer()">
-                              Disconnect
-                          </button>
-                      </span>
                 </div>
-                <!-- /input-group -->
-            </div>
-            <!-- /.col-lg-6 -->
-        </div>
-        <!-- /.row -->
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="input-group">
-                    Connection Status:
-                      <span id="connectionStatus" class="input-group-btn">
-                          Disconnected
-                      </span>
+                <div class="col-sm-1" style="margin-right: 10px;">
+                    <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">
+                        Connect
+                    </button>
                 </div>
-                <!-- /input-group -->
+                <div class="col-sm-1">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="disconnectToServer()">
+                        Disconnect
+                    </button>
+                </div>
             </div>
-            <!-- /.col-lg-6 -->
-        </div>
-        <!-- /.row -->
 
-            <textarea id="msgToServer" style="width: 700px; height: 300px" placeholder="Put your Message Here"></textarea>
-        </p>
 
-        <p>
-            <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">Send Message</button>
-        </p>
-        <p>
-              <textarea id="responseFromServer" placeholder="Response From Server" style="width: 700px; height: 300px">
-              </textarea>
-        </p>
+        </form>
 
     </div>
+    <!-- /.row -->
+    <div class="input-group">
+        Connection Status:
+      <span id="connectionStatus" class="input-group-btn">
+          Disconnected
+      </span>
+    </div>
+    <!-- /.row -->
+
+    <textarea id="msgToServer" style="width: 700px; height: 300px" placeholder="Put your Message Here"></textarea>
+
+    <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">
+        Send Message
+    </button>
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="error_icon" style="visibility: hidden"></span>
+
+    <br><br>
+          <textarea id="responseFromServer" placeholder="Response From Server" style="width: 700px; height: 300px"
+                    readonly>
+          </textarea>
+
 </div>
 <!-- /container -->
 
