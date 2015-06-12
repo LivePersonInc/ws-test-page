@@ -33,18 +33,27 @@
 
         var ws;
         function connectToServer() {
+            var icon = document.getElementById("connection_error_icon");
 
-            ws = new WebSocket(document.getElementById("serverSelected").value);
+            try {
+                ws = new WebSocket(document.getElementById("serverSelected").value);
 
-            ws.onopen = function () {
-                document.getElementById("connectionStatus").innerHTML = "Connected";
-            };
-            ws.onmessage = function (event) {
-                document.getElementById("responseFromServer").value = event.data;
-            };
-            ws.onclose = function () {
-                document.getElementById("connectionStatus").innerHTML = "Disconnected";
-            };
+                ws.onopen = function () {
+                    document.getElementById("connectionStatus").innerHTML = "Connected";
+                };
+                ws.onmessage = function (event) {
+                    document.getElementById("responseFromServer").value = event.data;
+                };
+                ws.onclose = function () {
+                    document.getElementById("connectionStatus").innerHTML = "Disconnected";
+                };
+                icon.style.visibility = "hidden";
+                icon.title = '';
+            } catch(e) {
+                icon.style.visibility = "visible";
+                icon.title = e.message;
+            }
+
 
         }
         function disconnectToServer() {
@@ -100,9 +109,10 @@
     <!-- /.row -->
     <div class="input-group">
         Connection Status:
-      <span id="connectionStatus" class="input-group-btn">
+      <span id="connectionStatus">
           Disconnected
       </span>
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="connection_error_icon" style="color:#c9302c; visibility: hidden"></span>
     </div>
     <!-- /.row -->
 
@@ -111,7 +121,7 @@
     <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">
         Send Message
     </button>
-    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="error_icon" style="visibility: hidden"></span>
+    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="error_icon" style="color:#c9302c; visibility: hidden"></span>
 
     <br><br>
           <textarea id="responseFromServer" placeholder="Response From Server" style="width: 700px; height: 300px"
