@@ -37,6 +37,7 @@
 
             try {
                 ws = new WebSocket(document.getElementById("serverSelected").value);
+                document.getElementById("connectionStatus").innerHTML = "Connecting";
 
                 ws.onopen = function () {
                     document.getElementById("connectionStatus").innerHTML = "Connected";
