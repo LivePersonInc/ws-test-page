@@ -88,4 +88,17 @@ body {
   text-align: left;
   word-wrap: break-word;
   word-break: break-all;
+
+}
+
+#historyContainer li:hover{
+  background-color: #0095dd;
+  color: white;
+  cursor: pointer;
+}
+
+#historyContainer li:active{
+  background-color: #5cb85c;
+  color: white;
+  cursor: pointer;
 }
