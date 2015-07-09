@@ -77,3 +77,15 @@ body {
     border-bottom: 0;
   }
 }
+
+#responseFromServer li{
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+#historyContainer li{
+  text-align: left;
+  word-wrap: break-word;
+  word-break: break-all;
+}

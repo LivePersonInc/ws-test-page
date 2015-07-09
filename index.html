@@ -33,6 +33,8 @@
 
         var ws;
         var logContainer;
+        var historyContainer;
+        var messagesHistory = [];
         function connectToServer() {
             var icon = document.getElementById("connection_error_icon");
 
@@ -51,9 +53,27 @@
                 };
                 icon.style.visibility = "hidden";
                 icon.title = '';
-            } catch(e) {
+            } catch (e) {
                 icon.style.visibility = "visible";
                 icon.title = e.message;
+            }
+        }
+
+        function storeHistory() {
+            if (messagesHistory && messagesHistory.length >= 100) {
+                messagesHistory = messagesHistory.slice(0,100)
+            }
+            localStorage.setItem("history", JSON.stringify(messagesHistory));
+        }
+
+        function getHistory() {
+            var his = localStorage.getItem("history");
+            if (his) {
+                try {
+                    his = JSON.parse(his);
+                    messagesHistory = his;
+                } catch (exc) {
+                }
             }
         }
 
@@ -69,7 +89,7 @@
         function createLogLine(msg) {
             var date = new Date();
             var logLine = document.createElement("li");
-            logLine.innerHTML = date.getHours() + ":" + getInTwoDigits(date.getMinutes()) +":" + getInTwoDigits(date.getSeconds()) + " : " + formatMessage(msg);
+            logLine.innerHTML = date.getHours() + ":" + getInTwoDigits(date.getMinutes()) + ":" + getInTwoDigits(date.getSeconds()) + " : " + formatMessage(msg);
             logLine.className = 'list-group-item';
             appendLogLine(logLine);
         }
@@ -85,6 +105,31 @@
             }
         }
 
+        function createHistoryLine(msg) {
+            var date = new Date();
+            var logLine = document.createElement("li");
+            var data = "<div>Time: <span>" + date.getHours() + ":" + getInTwoDigits(date.getMinutes()) + ":" + getInTwoDigits(date.getSeconds()) + "</span></div>\
+            <div>URL: <span>" + msg.url + "</span></div>\
+            <div>message: <span>" + msg.message + "</span></div>";
+            logLine.innerHTML = data;
+            logLine.onclick = function() {
+                historySelect(msg);
+            };
+            logLine.className = 'list-group-item';
+            appendHistoryLine(logLine);
+        }
+
+        function appendHistoryLine(line) {
+            if (!historyContainer) {
+                historyContainer = document.getElementById("historyContainer");
+            }
+            if (historyContainer.hasChildNodes()) {
+                historyContainer.insertBefore(line, historyContainer.firstChild);
+            } else {
+                historyContainer.appendChild(line);
+            }
+        }
+
         function formatMessage(msg) {
             if (typeof msg === "object") {
                 return JSON.stringify(msg);
@@ -92,8 +137,8 @@
             return msg;
         }
 
-        function getInTwoDigits(num){
-            return num < 10 ? '0' + num : '' +num;
+        function getInTwoDigits(num) {
+            return num < 10 ? '0' + num : '' + num;
         }
 
         function disconnectToServer() {
@@ -106,71 +151,112 @@
                 ws.send(JSON.stringify(msgObj));
                 icon.style.visibility = "hidden";
                 icon.title = '';
+
+                var historyLine = {
+                    url: document.getElementById("serverSelected").value,
+                    message: document.getElementById("msgToServer").value
+                };
+                messagesHistory.unshift(historyLine);
+                createHistoryLine(historyLine);
+                storeHistory();
+
             } catch (e) {
                 icon.style.visibility = "visible";
                 icon.title = e.message;
             }
         }
 
+        function historySelect(msg) {
+            document.getElementById("serverSelected").value = msg.url;
+            document.getElementById("msgToServer").value = msg.message;
+        }
+
+        function loadHistory() {
+            getHistory();
+            if (messagesHistory && messagesHistory.length) {
+                for (var i = 0; i < messagesHistory.length; i++) {
+                    createHistoryLine(messagesHistory[i]);
+                }
+            }
+        }
+
     </script>
 </head>
 
-<body>
+<body onload="loadHistory()">
 
-<div class="container">
-    <div class="header">
-        <h3 class="text-muted">WebSocket Test Page Client</h3>
-    </div>
+<div class="container-fluid">
+    <div class="row">
 
-    <div class="jumbotron_">
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label for="serverSelected" class="col-sm-1 control-label">URL:</label>
-                <div class="col-sm-7">
-                    <input type="text" id="serverSelected" class="form-control" placeholder="ws://domain/path"/>
-
-                </div>
-                <div class="col-sm-1" style="margin-right: 10px;">
-                    <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">
-                        Connect
-                    </button>
-                </div>
-                <div class="col-sm-1">
-                    <button type="button" class="btn btn-sm btn-danger" onclick="disconnectToServer()">
-                        Disconnect
-                    </button>
-                </div>
+        <div class="col-sm-3">
+            <div class="header">
+                <h3 class="text-muted">History</h3>
             </div>
-        </form>
+            <ul class="list-group" id="historyContainer" style="height: 650px; overflow-y: auto; overflow-x: hidden; text-align: left;">
+            </ul>
+        </div>
 
-    </div>
-    <!-- /.row -->
-    <div class="input-group">
-        Connection Status:
+        <div class="col-sm-6">
+            <div class="header">
+                <h3 class="text-muted">WebSocket Test Page Client</h3>
+            </div>
+
+            <div class="jumbotron_">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="serverSelected" class="col-sm-1 control-label">URL:</label>
+
+                        <div class="col-sm-7">
+                            <input type="text" id="serverSelected" class="form-control" placeholder="ws://domain/path"/>
+
+                        </div>
+                        <div class="col-sm-1" style="margin-right: 10px;">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">
+                                Connect
+                            </button>
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="disconnectToServer()">
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <!-- /.row -->
+            <div class="input-group">
+                Connection Status:
       <span id="connectionStatus">
           Disconnected
       </span>
-        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="connection_error_icon" style="color:#c9302c; visibility: hidden"></span>
-    </div>
-    <!-- /.row -->
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="connection_error_icon"
+                  style="color:#c9302c; visibility: hidden"></span>
+            </div>
+            <!-- /.row -->
 
-    <textarea id="msgToServer" style="width: 700px; height: 300px" placeholder="Put your Message Here"></textarea>
+            <textarea id="msgToServer" style="width: 700px; height: 220px"
+                      placeholder="Put your Message Here"></textarea>
 
-    <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">
-        Send Message
-    </button>
+            <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">
+                Send Message
+            </button>
 
-    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="error_icon" style="color:#c9302c; visibility: hidden"></span>
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="error_icon"
+              style="color:#c9302c; visibility: hidden"></span>
 
-    <button type="button" class="btn btn-sm btn-success" onclick="clearLog()">
-        Clear
-    </button>
+            <button type="button" class="btn btn-sm btn-success" onclick="clearLog()">
+                Clear
+            </button>
 
-    <br><br>
+            <br><br>
 
-    <div style="width: 700px; height: 300px   overflow-y: auto; overflow-x: hidden; text-align: left;" id="logContainer">
-        <ul class="list-group" id="responseFromServer">
-        </ul>
+            <div style="width: 700px; height: 300px; overflow-y: auto; overflow-x: hidden; text-align: left;"
+                 id="logContainer">
+                <ul class="list-group" id="responseFromServer">
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 <!-- /container -->
