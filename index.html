@@ -32,6 +32,7 @@
     <script>
 
         var ws;
+        var logContainer;
         function connectToServer() {
             var icon = document.getElementById("connection_error_icon");
 
@@ -43,7 +44,7 @@
                     document.getElementById("connectionStatus").innerHTML = "Connected";
                 };
                 ws.onmessage = function (event) {
-                    document.getElementById("responseFromServer").value = event.data;
+                    createLogLine(event.data);
                 };
                 ws.onclose = function () {
                     document.getElementById("connectionStatus").innerHTML = "Disconnected";
@@ -54,9 +55,47 @@
                 icon.style.visibility = "visible";
                 icon.title = e.message;
             }
-
-
         }
+
+        function clearLog() {
+            if (!logContainer) {
+                logContainer = document.getElementById("responseFromServer");
+            }
+            while (logContainer.firstChild) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
+        }
+
+        function createLogLine(msg) {
+            var date = new Date();
+            var logLine = document.createElement("li");
+            logLine.innerHTML = date.getHours() + ":" + getInTwoDigits(date.getMinutes()) +":" + getInTwoDigits(date.getSeconds()) + " : " + formatMessage(msg);
+            logLine.className = 'list-group-item';
+            appendLogLine(logLine);
+        }
+
+        function appendLogLine(line) {
+            if (!logContainer) {
+                logContainer = document.getElementById("responseFromServer");
+            }
+            if (logContainer.hasChildNodes()) {
+                logContainer.insertBefore(line, logContainer.firstChild);
+            } else {
+                logContainer.appendChild(line);
+            }
+        }
+
+        function formatMessage(msg) {
+            if (typeof msg === "object") {
+                return JSON.stringify(msg);
+            }
+            return msg;
+        }
+
+        function getInTwoDigits(num){
+            return num < 10 ? '0' + num : '' +num;
+        }
+
         function disconnectToServer() {
             ws.close();
         }
@@ -120,11 +159,19 @@
     <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">
         Send Message
     </button>
+
     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="error_icon" style="color:#c9302c; visibility: hidden"></span>
 
-    <br><br>
-    <textarea id="responseFromServer" placeholder="Response From Server" style="width: 700px; height: 300px" readonly></textarea>
+    <button type="button" class="btn btn-sm btn-success" onclick="clearLog()">
+        Clear
+    </button>
 
+    <br><br>
+
+    <div style="width: 700px; height: 300px   overflow-y: auto; overflow-x: hidden; text-align: left;" id="logContainer">
+        <ul class="list-group" id="responseFromServer">
+        </ul>
+    </div>
 </div>
 <!-- /container -->
 
