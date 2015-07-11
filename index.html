@@ -61,7 +61,7 @@
 
         function storeHistory() {
             if (messagesHistory && messagesHistory.length >= 100) {
-                messagesHistory = messagesHistory.slice(0,100)
+                messagesHistory = messagesHistory.slice(0, 100)
             }
             localStorage.setItem("history", JSON.stringify(messagesHistory));
         }
@@ -106,13 +106,18 @@
         }
 
         function createHistoryLine(msg) {
-            var date = new Date();
+            if (!msg.date) {
+                msg.date = new Date();
+            }
+            else if (typeof msg.date === "string") {
+                msg.date = new Date(msg.date);
+            }
             var logLine = document.createElement("li");
-            var data = "<div>Time: <span>" + date.getHours() + ":" + getInTwoDigits(date.getMinutes()) + ":" + getInTwoDigits(date.getSeconds()) + "</span></div>\
+            var data = "<div>Time: <span>" + msg.date.toLocaleString() + "</span></div>\
             <div>URL: <span>" + msg.url + "</span></div>\
             <div>message: <span>" + msg.message + "</span></div>";
             logLine.innerHTML = data;
-            logLine.onclick = function() {
+            logLine.onclick = function () {
                 historySelect(msg);
             };
             logLine.className = 'list-group-item';
@@ -154,7 +159,8 @@
 
                 var historyLine = {
                     url: document.getElementById("serverSelected").value,
-                    message: document.getElementById("msgToServer").value
+                    message: document.getElementById("msgToServer").value,
+                    date: new Date()
                 };
                 messagesHistory.unshift(historyLine);
                 createHistoryLine(historyLine);
@@ -174,7 +180,7 @@
         function loadHistory() {
             getHistory();
             if (messagesHistory && messagesHistory.length) {
-                for (var i = 0; i < messagesHistory.length; i++) {
+                for (var i = messagesHistory.length - 1; i >= 0; i--) {
                     createHistoryLine(messagesHistory[i]);
                 }
             }
@@ -185,81 +191,94 @@
 
 <body onload="loadHistory()">
 
-<div class="container-fluid">
-    <div class="row">
+<div id="wrapper">
+    <div id="content">
 
-        <div class="col-sm-3">
-            <div class="header">
-                <h3 class="text-muted">History</h3>
-            </div>
-            <ul class="list-group table-hover" id="historyContainer" style="height: 650px; overflow-y: auto; overflow-x: hidden; text-align: left;">
-            </ul>
-        </div>
+        <div class="container-fluid">
+            <div class="row">
 
-        <div class="col-sm-6">
-            <div class="header">
-                <h3 class="text-muted">WebSocket Test Page Client</h3>
-            </div>
-
-            <div class="jumbotron_">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label for="serverSelected" class="col-sm-1 control-label">URL:</label>
-
-                        <div class="col-sm-7">
-                            <input type="text" id="serverSelected" class="form-control" placeholder="ws://domain/path"/>
-
-                        </div>
-                        <div class="col-sm-1" style="margin-right: 10px;">
-                            <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">
-                                Connect
-                            </button>
-                        </div>
-                        <div class="col-sm-1">
-                            <button type="button" class="btn btn-sm btn-danger" onclick="disconnectToServer()">
-                                Disconnect
-                            </button>
-                        </div>
+                <div class="col-sm-3">
+                    <div class="header">
+                        <h4 class="text-muted">History</h4>
                     </div>
-                </form>
 
-            </div>
-            <!-- /.row -->
-            <div class="input-group">
-                Connection Status:
+                    <ul class="list-group" id="historyContainer"
+                        style="max-height:550px; overflow-y: auto; overflow-x: hidden; text-align: left;">
+                    </ul>
+                </div>
+
+                <div class="col-sm-6">
+                    <div class="header">
+                        <h4 class="text-muted">WebSocket Test Page Client</h4>
+                    </div>
+
+                    <div class="jumbotron_">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="serverSelected" class="col-sm-1 control-label">URL:</label>
+
+                                <div class="col-sm-7">
+                                    <input type="text" id="serverSelected" class="form-control"
+                                           placeholder="ws://domain/path"/>
+
+                                </div>
+                                <div class="col-sm-1" style="margin-right: 30px;">
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">
+                                        Connect
+                                    </button>
+                                </div>
+                                <div class="col-sm-1">
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="disconnectToServer()">
+                                        Disconnect
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <!-- /.row -->
+                    <div class="input-group">
+                        Connection Status:
       <span id="connectionStatus">
           Disconnected
       </span>
             <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="connection_error_icon"
                   style="color:#c9302c; visibility: hidden"></span>
-            </div>
-            <!-- /.row -->
+                    </div>
+                    <!-- /.row -->
 
-            <textarea id="msgToServer" style="width: 700px; height: 220px"
+            <textarea id="msgToServer" style="width: 700px; min-height: 220px"
                       placeholder="Put your Message Here"></textarea>
 
-            <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">
-                Send Message
-            </button>
+                    <button type="button" class="btn btn-sm btn-success" onclick="sendMessage()">
+                        Send Message
+                    </button>
 
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true" id="error_icon"
               style="color:#c9302c; visibility: hidden"></span>
 
-            <button type="button" class="btn btn-sm btn-success" onclick="clearLog()">
-                Clear
-            </button>
+                    <button type="button" class="btn btn-sm btn-success" onclick="clearLog()">
+                        Clear
+                    </button>
 
-            <br><br>
+                    <br><br>
 
-            <div style="width: 700px; height: 300px; overflow-y: auto; overflow-x: hidden; text-align: left;"
-                 id="logContainer">
-                <ul class="list-group" id="responseFromServer">
-                </ul>
+                    <div style="width: 700px; height: 220px; overflow-y: auto; overflow-x: hidden; text-align: left;"
+                         id="logContainer">
+                        <ul class="list-group" id="responseFromServer">
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <!-- /container -->
+    <div id="foot" class="text-center">
+        This Page is Open Source - Fork Us on <a
+            href="https://github.com/LivePersonInc/ws-test-page">GitHub</a>
+    </div>
 </div>
-<!-- /container -->
+
 
 </body>
 </html>
