@@ -197,17 +197,21 @@
         <div class="container-fluid">
             <div class="row">
 
-                <div class="col-sm-3">
+                <div class="col-md-3">
                     <div class="header">
                         <h4 class="text-muted">History</h4>
                     </div>
-
-                    <ul class="list-group" id="historyContainer"
-                        style="max-height:550px; overflow-y: auto; overflow-x: hidden; text-align: left;">
-                    </ul>
+                    <!--<div class="navbar-static-top pre-scrollable"-->
+                    <!--style="position: fixed; min-height: 76%;width: inherit;">-->
+                    <div style="height: 76vh;">
+                        <ul class="list-group" id="historyContainer"
+                            style="height: 76vh; overflow-y: auto; overflow-x: hidden; text-align: left;">
+                        </ul>
+                    </div>
+                    <!--</div>-->
                 </div>
 
-                <div class="col-sm-6">
+                <div class="col-md-6">
                     <div class="header">
                         <h4 class="text-muted">WebSocket Test Page Client</h4>
                     </div>
@@ -223,12 +227,14 @@
 
                                 </div>
                                 <div class="col-sm-1" style="margin-right: 30px;">
-                                    <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">
+                                    <button type="button" class="btn btn-sm btn-primary"
+                                            onclick="connectToServer()">
                                         Connect
                                     </button>
                                 </div>
                                 <div class="col-sm-1">
-                                    <button type="button" class="btn btn-sm btn-danger" onclick="disconnectToServer()">
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                            onclick="disconnectToServer()">
                                         Disconnect
                                     </button>
                                 </div>
