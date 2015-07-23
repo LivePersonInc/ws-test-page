@@ -152,8 +152,8 @@
         function sendMessage() {
             var icon = document.getElementById("error_icon");
             try {
-                var msgObj = JSON.parse(document.getElementById("msgToServer").value);
-                ws.send(JSON.stringify(msgObj));
+                var msgObj = document.getElementById("msgToServer").value;
+                ws.send(msgObj);
                 icon.style.visibility = "hidden";
                 icon.title = '';
 
