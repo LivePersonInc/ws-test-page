@@ -1,0 +1,109 @@
+/*I love me some border-box*/
+* {
+    box-sizing: border-box;
+}
+
+/*Just removing default browser padding/margin*/
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+/*This just stops me getting horizontal scrolling if anything overflows the width*/
+body {
+    overflow-x: hidden;
+}
+
+/*Flexbox gives us the flexiness we need. The top just stays put as there is no scrolling on the body due to the page never exceeding viewport height*/
+.Bottom {
+    align-items: center;
+    justify-content: center;
+    background-color:#efefef;
+    width:100%;
+    height:60px;
+    position: relative;
+    z-index: 10;
+    bottom:0;
+    left:0;
+    padding-top:20px;
+    padding-bottom:20px;
+}
+/*This is our main wrapping element, it's made 100vh high to ensure it is always the correct size and then moved into place and padded with negative margin and padding*/
+#content {
+    display: flex;
+    overflow: hidden;
+    height: calc(100vh - 60px);
+    position: relative;
+    width: 100%;
+    backface-visibility: hidden;
+    will-change: overflow;
+}
+/*All the scrollable sections should overflow and be whatever height they need to be. As they are flex-items (due to being inside a flex container) they could be made to stretch full height at all times if needed.
+WebKit inertia scrolling is being added here for any present/future devices that are able to make use of it.
+*/
+.Left,
+.Middle{
+    overflow: auto;
+    height: auto;
+    padding: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+}
+/*Entirely optional – just wanted to remove the scrollbar on WebKit browsers as I find them ugly*/
+.Left::-webkit-scrollbar,
+.Middle::-webkit-scrollbar {
+    display: none;
+}
+/*  Left and Right are set sizes while the Middle is set to flex one so it occupies all remaining space. This could be set as a width too if prefereable, perhaps using calc.*/
+.Left {
+    width: 33.3rem;
+}
+
+.Middle {
+    flex: 1;
+}
+
+#historyContainer{
+    overflow-y: auto;
+    overflow-x: hidden;
+    text-align: left;
+
+}
+
+#historyContainer li{
+    text-align: left;
+    word-wrap: break-word;
+    word-break: break-all;
+
+}
+
+#historyContainer li:hover{
+    background-color: #0095dd;
+    color: white;
+    cursor: pointer;
+}
+
+#historyContainer li:active{
+    background-color: #5cb85c;
+    color: white;
+    cursor: pointer;
+}
+
+#responseFromServer li{
+    text-align: left;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+#logContainer {
+    width: 80rem;
+    height: 35vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    text-align: left;
+}
+
+#logContainer::-webkit-scrollbar {
+    display: none;
+}
