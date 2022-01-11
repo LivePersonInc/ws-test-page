@@ -36,7 +36,7 @@
             var icon = document.getElementById("connection_error_icon");
 
             try {
-                ws = new WebSocket(document.getElementById("serverSelected").value);
+                ws = new WebSocket(document.getElementById("serverSelected").value, document.getElementById("subproto").value);
 
                 ws.onopen = function () {
                     document.getElementById("connectionStatus").innerHTML = "Connected";
@@ -90,6 +90,9 @@
                     <input type="text" id="serverSelected" class="form-control" placeholder="ws://domain/path"/>
 
                 </div>
+                <div class="col-sm-1">
+                    <input type="text" id="subproto" class="form-control" placeholder="subprotocol">
+                 </div>
                 <div class="col-sm-1" style="margin-right: 10px;">
                     <button type="button" class="btn btn-sm btn-primary" onclick="connectToServer()">
                         Connect
