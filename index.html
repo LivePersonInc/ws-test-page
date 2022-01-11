@@ -36,7 +36,7 @@
             var icon = document.getElementById("connection_error_icon");
 
             try {
-                ws = new WebSocket(document.getElementById("serverSelected").value);
+                ws = new WebSocket(document.getElementById("serverSelected").value, document.getElementById("subproto").value);
 
                 ws.onopen = function () {
                     document.getElementById("connectionStatus").innerHTML = "Connected";
