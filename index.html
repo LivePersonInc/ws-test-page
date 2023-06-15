@@ -44,8 +44,8 @@
                 ws.onmessage = function (event) {
                     document.getElementById("responseFromServer").value = event.data;
                 };
-                ws.onclose = function () {
-                    document.getElementById("connectionStatus").innerHTML = "Disconnected";
+                ws.onclose = function (event) {
+                    document.getElementById("connectionStatus").innerHTML = `Disconnected code:${event.code} reason:${event.reason}`;
                 };
                 icon.style.visibility = "hidden";
                 icon.title = '';
